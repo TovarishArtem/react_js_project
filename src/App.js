@@ -1,58 +1,97 @@
-import React from 'react';
+import React from 'react'
 import Header from './components/Header'
 import Users from './components/Users'
-import AddUser from './components/AddUser';
-import axios from 'axios';
+import AddUser from './components/AddUser'
 
-const baseUrl = 'https://reqres.in/api/users?page=1'
+class App extends React.Component {
+	constructor(props) {
+		super(props)
+		this.state = {
+			cases: [
+				{
+					main_case: '',
+					title: 'Помыть посуду',
+					text: 'помыть  для мамы посуду',
+					nesting: [],
+				},
+			],
+		}
+		this.addUser = this.addUser.bind(this)
+		this.deleteUser = this.deleteUser.bind(this)
+		this.editUser = this.editUser.bind(this)
+		this.addNesting = this.addNesting.bind(this)
+	}
+	render() {
+		return (
+			<div>
+				<Header title='Список пользователей' />
+				<main>
+					<Users
+						cases={this.state.cases}
+						onEdit={this.editUser}
+						onDelete={this.deleteUser}
+					/>
+				</main>
 
-class App extends React.Component{
- 
-  constructor(props){
-    super(props)
-    axios.get(baseUrl).then((res) => {
-      this.setState({users: res.data.data})
-    })
-    this.state = {
-        users: []  
-    }
-    this.addUser = this.addUser.bind(this)
-    this.deleteUser = this.deleteUser.bind(this)
-    this.editUser = this.editUser.bind(this)
+				<aside>
+					<AddUser
+						onAdd={this.addUser}
+						cases={this.state.cases}
+						addNesting={this.addNesting}
+					/>
+				</aside>
+			</div>
+		)
+	}
+	editUser(casee) {
+		let allCases = this.state.cases
+		allCases[casee.id - 1] = casee
 
-}
-  render() {
-    return (<div>
-      <Header title='Список пользователей' />
-      <main>
-        <Users users={this.state.users} onEdit={this.editUser} onDelete={this.deleteUser} />
-      </main>
-      <aside>
-        <AddUser onAdd={this.addUser} />
-      </aside>
-    </div>)
-  }
-  editUser(user){
-    let allUsers = this.state.users
-    allUsers[user.id - 1] = user
+		this.setState({ cases: [] }, () => {
+			this.setState({
+				users: [...allCases],
+			})
+		})
+	}
 
-    this.setState({users: []}, () => {
-      this.setState({
-        users: [...allUsers]
-      })
-    })
-  }
+	deleteUser(id) {
+		this.setState({
+			users: this.state.users.filter(el => el.id !== id),
+		})
+	}
 
-  deleteUser(id){
-    this.setState({
-      users: this.state.users.filter((el) => el.id !==id)
-    })
-  } 
+	addUser(casee) {
+		const id = this.state.cases.length + 1
+		this.setState({ cases: [...this.state.cases, { id, ...casee }] })
+	}
+	addNesting(casee) {
+		const nestingTitle = casee.main_case
 
-  addUser(user){
-    const id = this.state.users.length + 1
-    this.setState({users: [...this.state.users, {id, ...user}]})
-  }
-      
+		// Создаем уникальный id для добавляемого элемента
+		const newId =
+			Math.max(
+				...this.state.cases.flatMap(item =>
+					Array.isArray(item.nesting) ? item.nesting.map(n => n.id || 0) : [0]
+				),
+				0
+			) + 1
+
+		// Обновляем массив cases, добавляя casee в nesting нужного объекта
+		const updatedCases = this.state.cases.map(item => {
+			if (item.title === nestingTitle) {
+				// Проверяем, что nesting существует и является массивом
+				const currentNesting = Array.isArray(item.nesting) ? item.nesting : []
+
+				return {
+					...item,
+					nesting: [...currentNesting, { ...casee, id: newId }],
+				}
+			}
+			return item
+		})
+
+		// Обновляем состояние
+		this.setState({ cases: updatedCases })
+	}
 }
 export default App

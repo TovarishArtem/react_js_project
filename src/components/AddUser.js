@@ -1,43 +1,78 @@
-import React from "react";
+import React from 'react'
 
 class AddUser extends React.Component {
-    userAdd = {}
-    constructor(props){
-        super(props)
-        this.state = {
-            firt_name: "",
-            last_name: "",
-            email: "",
-            age: 1,
-            isHappy: false
-        }
-    }
+	constructor(props) {
+		super(props)
+		this.state = {
+			main_case: '',
+			title: '',
+			text: '',
+		}
+		this.handleCaseClick = this.handleCaseClick.bind(this)
+	}
 
-    render() {
-        return (
-            <form ref={(el) => this.myForm = el}>
-                <input placeholder="Имя" onChange={(e) => this.setState({first_name: e.target.value}) } />
-                <input placeholder="Фамилия" onChange={(e) => this.setState({last_name: e.target.value}) }/>
-                <textarea placeholder="Почта" onChange={(e) => this.setState({email: e.target.value}) }></textarea>
-                <input placeholder="Возраст" onChange={(e) => this.setState({age: e.target.value}) } />
-                <label htmlFor="isHappy">Счастлив?</label>
-                <input type="checkbox" id="isHappy" onChange={(e) => this.setState({isHappy: e.target.value}) } />
-                <button type="button"onClick={() => {
-                this.myForm.reset()
-                this.userAdd = {
-                    firstname: this.state.firtname,
-                    lastname: this.state.lastname,
-                    email: this.state.email,
-                    age: this.state.age,
-                    isHappy: this.state.isHappy,
-                }
-                if(this.props.user)
-                    this.userAdd.id = this.props.user.id
-                this.props.onAdd(this.userAdd)
-                }}>Добавить</button>
-            </form>
-        )
-    }
+	render() {
+		return (
+			<div>
+				<form ref={el => (this.myForm = el)}>
+					<div className='container_cases_on_top'>
+						{this.props.cases &&
+							this.props.cases.map(el => (
+								<div
+									key={el.title}
+									onClick={() => this.handleCaseClick(el.title)}
+									className='item_cases_on_top'
+								>
+									{el.title}
+								</div>
+							))}
+					</div>
+					<input
+						type='checkbox'
+						id='isNesting'
+						onChange={e => this.setState({ main_case: '' })}
+					/>
+					<input
+						placeholder='Заголовок'
+						onChange={e => this.setState({ title: e.target.value })}
+					/>
+					<input
+						placeholder='Текст'
+						onChange={e => this.setState({ text: e.target.value })}
+					/>
+					{console.log(this.state.main_case)}
+					<button
+						type='button'
+						onClick={() => {
+							this.myForm.reset()
+
+							const newUser = {
+								main_case: this.state.main_case,
+								title: this.state.title,
+								text: this.state.text,
+								id: Date.now(), // Генерируем уникальный id для пользователя
+							}
+
+							console.log(this.state.main_case, 'add user')
+							if (this.state.main_case !== '') {
+								this.props.addNesting(newUser) // Передаем только newUser
+							} else {
+								this.props.onAdd(newUser)
+							}
+						}}
+					>
+						Добавить
+					</button>
+				</form>
+			</div>
+		)
+	}
+
+	handleCaseClick(el) {
+		this.setState({
+			main_case: el,
+		})
+	}
 }
 
 export default AddUser
