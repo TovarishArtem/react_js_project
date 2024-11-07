@@ -6,27 +6,66 @@ class User extends React.Component {
 		super(props)
 		this.state = {
 			active_case: '1',
-			isDoneCases: {}, // Объект для отслеживания состояния каждого чекбокса
+			isDoneCases: {},
+			openMenu: false, // Стейт для контроля состояния выпадающего меню
 		}
 	}
 
-	handleCheckboxChange = caseId => {
+	toggleMenu = () => {
 		this.setState(prevState => ({
-			isDoneCases: {
+			openMenu: !prevState.openMenu,
+		}))
+	}
+
+	handleCheckboxChange = caseId => {
+		this.setState(prevState => {
+			const newIsDoneCases = {
 				...prevState.isDoneCases,
 				[caseId]: !prevState.isDoneCases[caseId],
-			},
-		}))
+			}
+
+			// Проверяем, выделены ли все подзадачи
+			const { case: caseItem } = this.props
+			const allSubtasksDone = caseItem.nesting?.every(
+				subtask => newIsDoneCases[subtask.id]
+			)
+
+			// Если все подзадачи выполнены, то родительская задача тоже должна быть отмечена
+			if (allSubtasksDone) {
+				newIsDoneCases[caseItem.id] = true
+			} else {
+				// Если хотя бы одна подзадача не выполнена, родительский чекбокс снимается
+				newIsDoneCases[caseItem.id] = false
+			}
+
+			return { isDoneCases: newIsDoneCases }
+		})
 	}
 
 	handleMainCheckboxChange = () => {
 		const { case: caseItem } = this.props
-		this.setState(prevState => ({
-			isDoneCases: {
+		const isMainDone = !this.state.isDoneCases[caseItem.id]
+
+		this.setState(prevState => {
+			const newIsDoneCases = {
 				...prevState.isDoneCases,
-				[caseItem.id]: !prevState.isDoneCases[caseItem.id],
-			},
-		}))
+				[caseItem.id]: isMainDone,
+			}
+
+			// Если родительская задача выделена, все подзадачи также должны быть выделены
+			if (isMainDone) {
+				caseItem.nesting?.forEach(subtask => {
+					newIsDoneCases[subtask.id] = true
+				})
+			} else {
+				// Если родительская задача не выделена, все подзадачи снимаются
+				caseItem.nesting?.forEach(subtask => {
+					newIsDoneCases[subtask.id] = false
+				})
+			}
+
+			return { isDoneCases: newIsDoneCases }
+		})
 	}
 
 	render() {
@@ -36,7 +75,7 @@ class User extends React.Component {
 		return (
 			<div>
 				<ul className='menu'>
-					<li>
+					<li onClick={this.toggleMenu}>
 						<div className={`main_li_user ${isMainDone ? 'done' : ''}`}>
 							<div
 								className={`user ${isMainDone ? 'done' : ''}`}
@@ -53,13 +92,13 @@ class User extends React.Component {
 								</div>
 								<input
 									type='checkbox'
-									checked={isMainDone} // Управляемое состояние для главного чекбокса
-									onChange={this.handleMainCheckboxChange} // Обработчик для изменения состояния
+									checked={isMainDone}
+									onChange={this.handleMainCheckboxChange}
 								/>
 							</div>
 						</div>
 
-						<ul className='nesting_ul'>
+						<ul className={`nesting_ul ${this.state.openMenu ? 'open' : ''}`}>
 							{this.props.cases.map(el => (
 								<div key={el.id}>
 									{el.nesting &&
@@ -68,6 +107,7 @@ class User extends React.Component {
 												return (
 													<p key={index}>
 														<Nesting
+															forText={this.props.forText}
 															case={elem}
 															isDone={this.state.isDoneCases[elem.id] || false}
 															fun={() => this.handleCheckboxChange(elem.id)}

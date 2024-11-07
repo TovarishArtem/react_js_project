@@ -5,7 +5,7 @@ export class Nesting extends Component {
 		const { case: caseItem, isDone, fun } = this.props
 
 		return (
-			<div className='nesting'>
+			<div className='nesting' onClick={() => this.props.forText(caseItem)}>
 				<div className={`number_nesting ${caseItem.id}`}>
 					<div className={`user ${isDone ? 'done' : ''}`}>
 						<div className='span_and_p'>
