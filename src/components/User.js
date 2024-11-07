@@ -77,24 +77,32 @@ class User extends React.Component {
 				<ul className='menu'>
 					<li onClick={this.toggleMenu}>
 						<div className={`main_li_user ${isMainDone ? 'done' : ''}`}>
-							<div
-								className={`user ${isMainDone ? 'done' : ''}`}
-								onClick={() => {
-									this.setState({ active_case: caseItem.id })
-									this.props.forText(caseItem)
-								}}
-							>
-								<div className='span_and_p'>
-									<span className='material-symbols-outlined'>
-										chevron_left
+							<div className='user_container'>
+								<div
+									className={`user ${isMainDone ? 'done' : ''}`}
+									onClick={() => {
+										this.setState({ active_case: caseItem.id })
+										this.props.forText(caseItem)
+									}}
+								>
+									<div className='span_and_p'>
+										<span className='material-symbols-outlined'>
+											chevron_left
+										</span>
+										<p>{caseItem.title}</p>
+									</div>
+									<input
+										type='checkbox'
+										checked={isMainDone}
+										onChange={this.handleMainCheckboxChange}
+									/>
+									<span
+										onClick={() => this.props.onDeleteMain(caseItem)}
+										className='delete_icon'
+									>
+										x
 									</span>
-									<p>{caseItem.title}</p>
 								</div>
-								<input
-									type='checkbox'
-									checked={isMainDone}
-									onChange={this.handleMainCheckboxChange}
-								/>
 							</div>
 						</div>
 
@@ -107,8 +115,10 @@ class User extends React.Component {
 												return (
 													<p key={index}>
 														<Nesting
+															onDeleteNesting={this.props.onDeleteNesting}
 															forText={this.props.forText}
 															case={elem}
+															main_case={caseItem}
 															isDone={this.state.isDoneCases[elem.id] || false}
 															fun={() => this.handleCheckboxChange(elem.id)}
 														/>

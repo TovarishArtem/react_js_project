@@ -2,12 +2,17 @@ import React from 'react'
 import User from './User'
 import TextCase from './TextCase'
 
-let target
 class Users extends React.Component {
 	constructor(props) {
 		super(props)
 		this.state = {
-			elShow: '',
+			elShow: {
+				id: 0,
+				main_case: '',
+				title: 'Помыть посуду',
+				text: 'помыть  для мамы посуду',
+				nesting: [],
+			},
 		}
 		this.forTextMethod = this.forTextMethod.bind(this)
 	}
@@ -23,10 +28,10 @@ class Users extends React.Component {
 						{this.props.cases.map(el => (
 							<p>
 								<User
+									onDeleteMain={this.props.onDeleteMain}
+									onDeleteNesting={this.props.onDeleteNesting}
 									cases={this.props.cases}
 									forText={this.forTextMethod}
-									onEdit={this.props.onEdit}
-									onDelete={this.props.onDelete}
 									key={el.id}
 									case={el}
 								/>

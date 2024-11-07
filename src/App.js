@@ -18,8 +18,8 @@ class App extends React.Component {
 			],
 		}
 		this.addUser = this.addUser.bind(this)
-		this.deleteUser = this.deleteUser.bind(this)
-		this.editUser = this.editUser.bind(this)
+		this.deleteNesting = this.deleteNesting.bind(this)
+		this.deleteMainCase = this.deleteMainCase.bind(this)
 		this.addNesting = this.addNesting.bind(this)
 	}
 	render() {
@@ -30,7 +30,8 @@ class App extends React.Component {
 					<Users
 						cases={this.state.cases}
 						onEdit={this.editUser}
-						onDelete={this.deleteUser}
+						onDeleteMain={this.deleteMainCase}
+						onDeleteNesting={this.deleteNesting}
 					/>
 				</main>
 
@@ -44,21 +45,26 @@ class App extends React.Component {
 			</div>
 		)
 	}
-	editUser(casee) {
-		let allCases = this.state.cases
-		allCases[casee.id - 1] = casee
-
-		this.setState({ cases: [] }, () => {
-			this.setState({
-				users: [...allCases],
-			})
-		})
+	deleteMainCase(casee) {
+		const updatedCases = this.state.cases.filter(
+			caseItem => caseItem.id !== casee.id
+		)
+		this.setState({ cases: updatedCases }) // Используем this.setState для обновления состояния
 	}
 
-	deleteUser(id) {
-		this.setState({
-			users: this.state.users.filter(el => el.id !== id),
+	deleteNesting(mainCase, subTask) {
+		const updatedCases = this.state.cases.map(caseItem => {
+			if (caseItem.id === mainCase.id && caseItem.nesting) {
+				return {
+					...caseItem,
+					nesting: caseItem.nesting.filter(
+						subtask => subtask.id !== subTask.id
+					),
+				}
+			}
+			return caseItem
 		})
+		this.setState({ cases: updatedCases })
 	}
 
 	addUser(casee) {

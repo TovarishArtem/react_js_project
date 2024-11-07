@@ -10,13 +10,24 @@ export class Nesting extends Component {
 					<div className={`user ${isDone ? 'done' : ''}`}>
 						<div className='span_and_p'>
 							<span className='material-symbols-outlined'>chevron_left</span>
-							<li>{caseItem.text}</li>
+							<li>{caseItem.title}</li>
 						</div>
 						<input
 							type='checkbox'
 							checked={isDone} // Управляемое состояние чекбокса
 							onChange={fun} // Обработчик для изменения состояния
 						/>
+						<span
+							onClick={() =>
+								this.props.onDeleteNesting(
+									this.props.main_case,
+									this.props.case
+								)
+							}
+							className='delete_icon'
+						>
+							x
+						</span>
 					</div>
 				</div>
 			</div>

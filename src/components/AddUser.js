@@ -7,8 +7,23 @@ class AddUser extends React.Component {
 			main_case: '',
 			title: '',
 			text: '',
+			activeCase: '', // Состояние для отслеживания активной кнопки
 		}
 		this.handleCaseClick = this.handleCaseClick.bind(this)
+	}
+
+	handleCaseClick(el) {
+		this.setState({
+			main_case: el,
+			activeCase: el, // Устанавливаем активную кнопку
+		})
+	}
+
+	handleCheckboxChange = () => {
+		this.setState(prevState => ({
+			main_case: '', // Сбрасываем main_case, если это основная задача
+			activeCase: '', // Сбрасываем активную кнопку
+		}))
 	}
 
 	render() {
@@ -21,7 +36,9 @@ class AddUser extends React.Component {
 								<div
 									key={el.title}
 									onClick={() => this.handleCaseClick(el.title)}
-									className='item_cases_on_top'
+									className={`item_cases_on_top ${
+										this.state.activeCase === el.title ? 'active' : ''
+									}`} // Применяем класс active при совпадении
 								>
 									{el.title}
 								</div>
@@ -30,8 +47,9 @@ class AddUser extends React.Component {
 					<input
 						type='checkbox'
 						id='isNesting'
-						onChange={e => this.setState({ main_case: '' })}
+						onChange={this.handleCheckboxChange} // Используем новый обработчик
 					/>
+					Основная задача
 					<input
 						placeholder='Заголовок'
 						onChange={e => this.setState({ title: e.target.value })}
@@ -40,7 +58,6 @@ class AddUser extends React.Component {
 						placeholder='Текст'
 						onChange={e => this.setState({ text: e.target.value })}
 					/>
-					{console.log(this.state.main_case)}
 					<button
 						type='button'
 						onClick={() => {
@@ -50,12 +67,11 @@ class AddUser extends React.Component {
 								main_case: this.state.main_case,
 								title: this.state.title,
 								text: this.state.text,
-								id: Date.now(), // Генерируем уникальный id для пользователя
+								id: Date.now(),
 							}
 
-							console.log(this.state.main_case, 'add user')
 							if (this.state.main_case !== '') {
-								this.props.addNesting(newUser) // Передаем только newUser
+								this.props.addNesting(newUser)
 							} else {
 								this.props.onAdd(newUser)
 							}
@@ -66,12 +82,6 @@ class AddUser extends React.Component {
 				</form>
 			</div>
 		)
-	}
-
-	handleCaseClick(el) {
-		this.setState({
-			main_case: el,
-		})
 	}
 }
 
