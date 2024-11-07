@@ -88,7 +88,7 @@ main.user.p {
 	font-size: 18px;
 	line-height: 23.4px;
 }
-.user input {
+.main_li_user .user input {
 	width: 24px;
 	height: 24px;
 }
@@ -96,6 +96,27 @@ main.user.p {
 	display: flex;
 	align-items: center;
 	justify-content: space-between;
+}
+.user.done,
+.nesting.done {
+	background-color: #b8d9fce8; /* Синий фон */
+	color: rgb(96, 105, 169);
+}
+
+.nesting_ul .user .span_and_p .material-symbols-outlined {
+	opacity: 0;
+}
+.nesting .user .input {
+	width: 18px;
+	height: 18px;
+}
+.span_and_p {
+	display: flex;
+	align-items: center;
+}
+.menu:hover .material-symbols-outlined {
+	transform: rotate(90deg);
+	transition: transform 0.5s ease;
 }
 .container_cases_on_top {
 	display: flex;

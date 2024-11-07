@@ -9,6 +9,7 @@ class App extends React.Component {
 		this.state = {
 			cases: [
 				{
+					id: 0,
 					main_case: '',
 					title: 'Помыть посуду',
 					text: 'помыть  для мамы посуду',
@@ -61,8 +62,12 @@ class App extends React.Component {
 	}
 
 	addUser(casee) {
-		const id = this.state.cases.length + 1
-		this.setState({ cases: [...this.state.cases, { id, ...casee }] })
+		const newId =
+			this.state.cases.length > 0
+				? Math.max(...this.state.cases.map(c => c.id)) + 1
+				: 1
+
+		this.setState({ cases: [...this.state.cases, { id: newId, ...casee }] })
 	}
 	addNesting(casee) {
 		const nestingTitle = casee.main_case
