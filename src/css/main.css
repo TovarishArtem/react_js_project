@@ -38,6 +38,9 @@ main .user {
 	font-size: 20px;
 	cursor: pointer;
 }
+.delete_icon:hover {
+	color: #06147c;
+}
 .menu,
 .li {
 	list-style: none;
@@ -116,12 +119,13 @@ main .user p {
 	color: rgb(96, 105, 169);
 }
 
-.nesting_ul .user .span_and_p .material-symbols-outlined {
+.nesting_ul .user .span_and_p .arrow {
 	opacity: 0;
 }
 .nesting_ul {
 	overflow: scroll;
 }
+
 .nesting .user input {
 	width: 18px;
 	height: 18px;
@@ -131,9 +135,15 @@ main .user p {
 	display: flex;
 	align-items: center;
 }
-.menu:hover .material-symbols-outlined {
+.arrow:not(:hover) {
+	width: 1.5em;
+	height: 1.5em;
+	padding-right: 0.5em;
+	transition: all 0.5s ease;
+}
+.menu:hover .arrow {
 	transform: rotate(90deg);
-	transition: transform 0.5s ease;
+	transition: all 0.5s ease;
 }
 .container_cases_on_top {
 	display: flex;
@@ -201,7 +211,7 @@ form button:hover {
 .container_case_textCase {
 	display: flex;
 	justify-content: space-between;
-	width: 100%;
+
 	height: 500px;
 }
 .container_users {
@@ -211,13 +221,70 @@ form button:hover {
 	font-size: 15px;
 	font-weight: 500;
 }
+.container_form_edit {
+	display: flex;
+	justify-content: center;
+}
 .textCase {
 	background-color: #dce0e1;
-	width: 100%;
+
 	font-size: 18px;
 	line-height: 23.4px;
 	padding: 2em;
+	width: 50%;
+	word-wrap: break-word;
+	white-space: normal;
+	overflow: scroll;
+	position: relative;
 }
 .textCase p {
 	padding-top: 1em;
+	text-align: justify;
+}
+
+.form_text {
+	text-align: center;
+}
+.form_text input,
+textarea {
+	background-color: #222;
+	padding: 2em 1em;
+	margin-bottom: 2em;
+	outline: none;
+}
+.form_text,
+textarea,
+.form_text input {
+	width: 90%;
+	border-radius: 10px;
+	color: #fff;
+	font-size: 14px;
+	outline: none;
+}
+.container_button_save {
+	display: flex;
+	justify-content: space-between;
+	width: 100%;
+}
+.button_edit {
+	border-radius: 30px;
+	background-color: #222;
+	padding: 1em;
+	color: white;
+	border: none;
+	position: absolute;
+	top: 2%;
+	right: 2%;
+}
+.button_save_edit {
+	border-radius: 30px;
+	background-color: #222;
+	padding: 1em;
+	color: white;
+	border: none;
+}
+.button_edit:hover {
+	transform: scale(1.1);
+	background-color: rgb(93, 31, 31);
+	color: white;
 }

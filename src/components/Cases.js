@@ -1,18 +1,12 @@
 import React from 'react'
-import User from './User'
+import Case from './Case'
 import TextCase from './TextCase'
 
-class Users extends React.Component {
+class Cases extends React.Component {
 	constructor(props) {
 		super(props)
 		this.state = {
-			elShow: {
-				id: 0,
-				main_case: '',
-				title: 'Помыть посуду',
-				text: 'помыть  для мамы посуду',
-				nesting: [],
-			},
+			elShow: {},
 		}
 		this.forTextMethod = this.forTextMethod.bind(this)
 	}
@@ -27,7 +21,7 @@ class Users extends React.Component {
 					<div className='container_users'>
 						{this.props.cases.map(el => (
 							<p>
-								<User
+								<Case
 									onDeleteMain={this.props.onDeleteMain}
 									onDeleteNesting={this.props.onDeleteNesting}
 									cases={this.props.cases}
@@ -38,16 +32,16 @@ class Users extends React.Component {
 							</p>
 						))}
 					</div>
-					<TextCase case={this.state.elShow} />
+					<TextCase onSave={this.props.onSave} case={this.state.elShow} />
 				</div>
 			)
 		} else
 			return (
 				<div className='user'>
-					<h3>Пользователей нет</h3>
+					<h3>Нет задач</h3>
 				</div>
 			)
 	}
 }
 
-export default Users
+export default Cases

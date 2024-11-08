@@ -1,14 +1,56 @@
 import React from 'react'
 import Nesting from './Nesting'
+import { IoIosArrowBack } from 'react-icons/io'
 
-class User extends React.Component {
+class Case extends React.Component {
 	constructor(props) {
 		super(props)
 		this.state = {
 			active_case: '1',
 			isDoneCases: {},
 			openMenu: false, // Стейт для контроля состояния выпадающего меню
+			isEditing: false, // Режим редактирования задачи
+			title: props.case.title, // Поле для редактирования заголовка
+			text: props.case.text, // Поле для редактирования текста
 		}
+	}
+
+	// Обработка изменений заголовка
+	handleTitleChange = e => {
+		this.setState({ title: e.target.value })
+	}
+
+	// Обработка изменений текста
+	handleTextChange = e => {
+		this.setState({ text: e.target.value })
+	}
+
+	// Сохранение отредактированных данных
+	saveEdit = () => {
+		const updatedCase = {
+			...this.props.case,
+			title: this.state.title,
+			text: this.state.text,
+		}
+		// Предположим, что родительский компонент передает функцию saveEdit через пропсы
+		if (this.props.saveEdit) {
+			this.props.saveEdit(updatedCase)
+		}
+		this.setState({ isEditing: false }) // Выход из режима редактирования
+	}
+
+	// Включение режима редактирования
+	startEdit = () => {
+		this.setState({ isEditing: true })
+	}
+
+	// Отмена редактирования
+	cancelEdit = () => {
+		this.setState({
+			isEditing: false,
+			title: this.props.case.title, // Возвращаем исходные данные
+			text: this.props.case.text,
+		})
 	}
 
 	toggleMenu = () => {
@@ -24,17 +66,14 @@ class User extends React.Component {
 				[caseId]: !prevState.isDoneCases[caseId],
 			}
 
-			// Проверяем, выделены ли все подзадачи
 			const { case: caseItem } = this.props
 			const allSubtasksDone = caseItem.nesting?.every(
 				subtask => newIsDoneCases[subtask.id]
 			)
 
-			// Если все подзадачи выполнены, то родительская задача тоже должна быть отмечена
 			if (allSubtasksDone) {
 				newIsDoneCases[caseItem.id] = true
 			} else {
-				// Если хотя бы одна подзадача не выполнена, родительский чекбокс снимается
 				newIsDoneCases[caseItem.id] = false
 			}
 
@@ -52,13 +91,11 @@ class User extends React.Component {
 				[caseItem.id]: isMainDone,
 			}
 
-			// Если родительская задача выделена, все подзадачи также должны быть выделены
 			if (isMainDone) {
 				caseItem.nesting?.forEach(subtask => {
 					newIsDoneCases[subtask.id] = true
 				})
 			} else {
-				// Если родительская задача не выделена, все подзадачи снимаются
 				caseItem.nesting?.forEach(subtask => {
 					newIsDoneCases[subtask.id] = false
 				})
@@ -86,11 +123,11 @@ class User extends React.Component {
 									}}
 								>
 									<div className='span_and_p'>
-										<span className='material-symbols-outlined'>
-											chevron_left
-										</span>
+										<IoIosArrowBack className='arrow' />
+
 										<p>{caseItem.title}</p>
 									</div>
+
 									<input
 										type='checkbox'
 										checked={isMainDone}
@@ -137,4 +174,4 @@ class User extends React.Component {
 	}
 }
 
-export default User
+export default Case

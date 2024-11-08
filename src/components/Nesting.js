@@ -1,4 +1,5 @@
 import React, { Component } from 'react'
+import { IoIosArrowBack } from 'react-icons/io'
 
 export class Nesting extends Component {
 	render() {
@@ -9,7 +10,7 @@ export class Nesting extends Component {
 				<div className={`number_nesting ${caseItem.id}`}>
 					<div className={`user ${isDone ? 'done' : ''}`}>
 						<div className='span_and_p'>
-							<span className='material-symbols-outlined'>chevron_left</span>
+							<IoIosArrowBack className='arrow' />
 							<li>{caseItem.title}</li>
 						</div>
 						<input

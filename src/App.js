@@ -1,70 +1,63 @@
 import React from 'react'
 import Header from './components/Header'
-import Users from './components/Users'
-import AddUser from './components/AddUser'
+import Cases from './components/Cases'
+import AddCase from './components/AddCase'
 
 class App extends React.Component {
 	constructor(props) {
 		super(props)
+		const savedCases = localStorage.getItem('cases') // Получаем данные из localStorage
 		this.state = {
-			cases: [
-				{
-					id: 0,
-					main_case: '',
-					title: 'Помыть посуду',
-					text: 'помыть  для мамы посуду',
-					nesting: [],
-				},
-			],
+			cases: savedCases
+				? JSON.parse(savedCases)
+				: [
+						{
+							id: 0,
+							main_case: '',
+							title: 'Помыть посуду',
+							text: 'помыть для мамы посуду',
+							nesting: [],
+						},
+				  ],
 		}
 		this.addUser = this.addUser.bind(this)
 		this.deleteNesting = this.deleteNesting.bind(this)
 		this.deleteMainCase = this.deleteMainCase.bind(this)
 		this.addNesting = this.addNesting.bind(this)
+		this.handleSaveEdit = this.handleSaveEdit.bind(this)
 	}
-	render() {
-		return (
-			<div>
-				<Header title='Список пользователей' />
-				<main>
-					<Users
-						cases={this.state.cases}
-						onEdit={this.editUser}
-						onDeleteMain={this.deleteMainCase}
-						onDeleteNesting={this.deleteNesting}
-					/>
-				</main>
 
-				<aside>
-					<AddUser
-						onAdd={this.addUser}
-						cases={this.state.cases}
-						addNesting={this.addNesting}
-					/>
-				</aside>
-			</div>
-		)
+	componentDidMount() {
+		// Загружаем данные из localStorage при загрузке компонента
+		const savedCases = localStorage.getItem('cases')
+		if (savedCases) {
+			this.setState({ cases: JSON.parse(savedCases) })
+		}
 	}
+
+	componentDidUpdate(_, prevState) {
+		// Сохраняем данные в localStorage при изменении cases
+		if (prevState.cases !== this.state.cases) {
+			localStorage.setItem('cases', JSON.stringify(this.state.cases))
+		}
+	}
+	handleSaveEdit(updatedCase) {
+		this.setState(prevState => ({
+			cases: prevState.cases.map(caseItem =>
+				caseItem.id === updatedCase.id ? updatedCase : caseItem
+			),
+		}))
+	}
+
 	deleteMainCase(casee) {
 		const updatedCases = this.state.cases.filter(
 			caseItem => caseItem.id !== casee.id
 		)
-		this.setState({ cases: updatedCases }) // Используем this.setState для обновления состояния
+		this.setState({ cases: updatedCases })
 	}
 
 	deleteNesting(mainCase, subTask) {
-		const updatedCases = this.state.cases.map(caseItem => {
-			if (caseItem.id === mainCase.id && caseItem.nesting) {
-				return {
-					...caseItem,
-					nesting: caseItem.nesting.filter(
-						subtask => subtask.id !== subTask.id
-					),
-				}
-			}
-			return caseItem
-		})
-		this.setState({ cases: updatedCases })
+		console.log('deleteNesting called')
 	}
 
 	addUser(casee) {
@@ -72,13 +65,11 @@ class App extends React.Component {
 			this.state.cases.length > 0
 				? Math.max(...this.state.cases.map(c => c.id)) + 1
 				: 1
-
 		this.setState({ cases: [...this.state.cases, { id: newId, ...casee }] })
 	}
+
 	addNesting(casee) {
 		const nestingTitle = casee.main_case
-
-		// Создаем уникальный id для добавляемого элемента
 		const newId =
 			Math.max(
 				...this.state.cases.flatMap(item =>
@@ -87,12 +78,9 @@ class App extends React.Component {
 				0
 			) + 1
 
-		// Обновляем массив cases, добавляя casee в nesting нужного объекта
 		const updatedCases = this.state.cases.map(item => {
 			if (item.title === nestingTitle) {
-				// Проверяем, что nesting существует и является массивом
 				const currentNesting = Array.isArray(item.nesting) ? item.nesting : []
-
 				return {
 					...item,
 					nesting: [...currentNesting, { ...casee, id: newId }],
@@ -100,9 +88,33 @@ class App extends React.Component {
 			}
 			return item
 		})
-
-		// Обновляем состояние
 		this.setState({ cases: updatedCases })
 	}
+
+	render() {
+		return (
+			<div>
+				<Header title='Список пользователей' />
+				<main>
+					<Cases
+						cases={this.state.cases}
+						onEdit={this.editUser}
+						onSave={this.handleSaveEdit}
+						onDeleteMain={this.deleteMainCase}
+						onDeleteNesting={this.deleteNesting}
+					/>
+				</main>
+
+				<aside>
+					<AddCase
+						onAdd={this.addUser}
+						cases={this.state.cases}
+						addNesting={this.addNesting}
+					/>
+				</aside>
+			</div>
+		)
+	}
 }
+
 export default App

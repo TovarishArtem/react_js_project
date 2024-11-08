@@ -1,6 +1,6 @@
 import React from 'react'
 
-class AddUser extends React.Component {
+class AddCase extends React.Component {
 	constructor(props) {
 		super(props)
 		this.state = {
@@ -63,7 +63,7 @@ class AddUser extends React.Component {
 						onClick={() => {
 							this.myForm.reset()
 
-							const newUser = {
+							const newCase = {
 								main_case: this.state.main_case,
 								title: this.state.title,
 								text: this.state.text,
@@ -71,9 +71,9 @@ class AddUser extends React.Component {
 							}
 
 							if (this.state.main_case !== '') {
-								this.props.addNesting(newUser)
+								this.props.addNesting(newCase)
 							} else {
-								this.props.onAdd(newUser)
+								this.props.onAdd(newCase)
 							}
 						}}
 					>
@@ -85,4 +85,4 @@ class AddUser extends React.Component {
 	}
 }
 
-export default AddUser
+export default AddCase
