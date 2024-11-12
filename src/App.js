@@ -57,7 +57,25 @@ class App extends React.Component {
 	}
 
 	deleteNesting(mainCase, subTask) {
+		// Логируем вызов функции для отладки
 		console.log('deleteNesting called')
+
+		// Обновляем состояние, удаляя subTask из вложенных задач mainCase
+		this.setState(prevState => {
+			return {
+				cases: prevState.cases.map(caseItem => {
+					// Если это mainCase, удаляем subTask из массива nested задач
+					if (caseItem.id === mainCase.id) {
+						return {
+							...caseItem,
+							nesting: caseItem.nesting.filter(task => task.id !== subTask.id),
+						}
+					}
+					// Возвращаем caseItem без изменений, если это не mainCase
+					return caseItem
+				}),
+			}
+		})
 	}
 
 	addUser(casee) {
