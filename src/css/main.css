@@ -119,6 +119,12 @@ main .user p {
 	color: rgb(96, 105, 169);
 }
 
+/* Стили для активной задачи */
+.item_cases_on_top.active {
+	background-color: #ffeb3b; /* Цвет для активной задачи */
+	font-weight: bold;
+}
+
 .nesting_ul .user .span_and_p .arrow {
 	opacity: 0;
 }
@@ -148,6 +154,10 @@ main .user p {
 .container_cases_on_top {
 	display: flex;
 	flex-wrap: wrap;
+}
+.add_nesting {
+	margin-left: 10em;
+	font-size: 20px;
 }
 .item_cases_on_top {
 	cursor: pointer;
@@ -213,6 +223,10 @@ form button:hover {
 	justify-content: space-between;
 
 	height: 500px;
+}
+.h3_textCase {
+	width: 50%;
+	padding: 2em;
 }
 .container_users {
 	display: block;

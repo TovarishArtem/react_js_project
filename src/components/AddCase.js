@@ -4,81 +4,79 @@ class AddCase extends React.Component {
 	constructor(props) {
 		super(props)
 		this.state = {
-			main_case: '',
+			main_case: '', // ID of the selected parent task
 			title: '',
 			text: '',
-			activeCase: '', // Состояние для отслеживания активной кнопки
+			activeCase: '', // To visualize the selected task
 		}
-		this.handleCaseClick = this.handleCaseClick.bind(this)
 	}
 
-	handleCaseClick(el) {
+	//
+	// renderCases = (cases, level = 0) => {
+	// 	return cases.map(el => {
+	// 		const isActive = this.state.activeCase === el.id
+	// 		const isParent = level === 0
+
+	// 		return (
+	// 			<div
+	// 				key={el.id}
+	// 				style={{ marginLeft: level * 20 }}
+	// 				className={`item_cases_on_top ${isActive ? 'active' : ''} ${
+	// 					isParent ? 'parent-case' : 'nested-case'
+	// 				}`}
+	// 			>
+	// 				{el.title}
+	// 				{el.nesting && this.renderCases(el.nesting, level + 1)}{' '}
+	// 				{/* Recursion */}
+	// 			</div>
+	// 		)
+	// 	})
+	// }
+
+	handleSubmit = e => {
+		e.preventDefault()
+		const { main_case, title, text } = this.state
+
+		// Do nothing if title or text are empty
+		if (!title || !text) return
+
+		// Create a new case object
+		const newCase = {
+			title,
+			text,
+			id: Date.now(), // Use a timestamp for the unique task ID
+			nesting: [], // Empty nesting for now, to be added if it's a nested task
+		}
+		this.props.onAdd(newCase) // Add as a new main task
+
+		// Reset the form state after submission
 		this.setState({
-			main_case: el,
-			activeCase: el, // Устанавливаем активную кнопку
+			title: '',
+			text: '',
+			activeCase: '', // Reset the active case ID
 		})
-	}
-
-	handleCheckboxChange = () => {
-		this.setState(prevState => ({
-			main_case: '', // Сбрасываем main_case, если это основная задача
-			activeCase: '', // Сбрасываем активную кнопку
-		}))
 	}
 
 	render() {
 		return (
 			<div>
-				<form ref={el => (this.myForm = el)}>
+				<form ref={el => (this.myForm = el)} onSubmit={this.handleSubmit}>
 					<div className='container_cases_on_top'>
-						{this.props.cases &&
-							this.props.cases.map(el => (
-								<div
-									key={el.title}
-									onClick={() => this.handleCaseClick(el.title)}
-									className={`item_cases_on_top ${
-										this.state.activeCase === el.title ? 'active' : ''
-									}`} // Применяем класс active при совпадении
-								>
-									{el.title}
-								</div>
-							))}
+						{/* {this.props.cases && this.renderCases(this.props.cases)}{' '} */}
+						{/* Render tasks */}
 					</div>
-					<input
-						type='checkbox'
-						id='isNesting'
-						onChange={this.handleCheckboxChange} // Используем новый обработчик
-					/>
-					Основная задача
+
 					<input
 						placeholder='Заголовок'
+						value={this.state.title}
 						onChange={e => this.setState({ title: e.target.value })}
 					/>
 					<input
 						placeholder='Текст'
+						value={this.state.text}
 						onChange={e => this.setState({ text: e.target.value })}
 					/>
-					<button
-						type='button'
-						onClick={() => {
-							this.myForm.reset()
-
-							const newCase = {
-								main_case: this.state.main_case,
-								title: this.state.title,
-								text: this.state.text,
-								id: Date.now(),
-							}
-
-							if (this.state.main_case !== '') {
-								this.props.addNesting(newCase)
-							} else {
-								this.props.onAdd(newCase)
-							}
-						}}
-					>
-						Добавить
-					</button>
+					<button type='submit'>Добавить</button>
 				</form>
 			</div>
 		)

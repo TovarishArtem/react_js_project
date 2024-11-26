@@ -2,11 +2,26 @@ import React, { Component } from 'react'
 import { IoIosArrowBack } from 'react-icons/io'
 
 export class Nesting extends Component {
+	renderNestedCases = (cases, mainCase, level = 0) => {
+		// Рекурсивное отображение вложенных задач
+		return cases.map(nestedCase => (
+			<Nesting
+				key={nestedCase.id}
+				case={nestedCase}
+				main_case={mainCase}
+				isDone={nestedCase.isDone || false}
+				fun={() => this.props.onToggleDone(mainCase, nestedCase)}
+				onDeleteNesting={this.props.onDeleteNesting}
+				forText={this.props.forTextMethod}
+			/>
+		))
+	}
+
 	render() {
 		const { case: caseItem, isDone, fun } = this.props
 
 		return (
-			<div className='nesting' onClick={() => this.props.forText(caseItem)}>
+			<div className='nesting' onClick={() => this.props.selectCase(caseItem)}>
 				<div className={`number_nesting ${caseItem.id}`}>
 					<div className={`user ${isDone ? 'done' : ''}`}>
 						<div className='span_and_p'>
@@ -16,7 +31,7 @@ export class Nesting extends Component {
 						<input
 							type='checkbox'
 							checked={isDone} // Управляемое состояние чекбокса
-							onChange={fun} // Обработчик для изменения состояния
+							onChange={fun} // Обработчик изменения состояния
 						/>
 						<span
 							onClick={() =>
@@ -29,8 +44,19 @@ export class Nesting extends Component {
 						>
 							x
 						</span>
+						<div className='add_nesting'>
+							<button onClick={() => this.props.handleAddNesting(caseItem)}>
+								Добавить подзадачу
+							</button>
+						</div>
 					</div>
 				</div>
+				{/* Отображаем вложенные задачи, если они есть */}
+				{caseItem.nesting && caseItem.nesting.length > 0 && (
+					<div className='nested_cases'>
+						{this.renderNestedCases(caseItem.nesting, this.props.main_case)}
+					</div>
+				)}
 			</div>
 		)
 	}

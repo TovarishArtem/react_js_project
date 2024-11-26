@@ -4,44 +4,56 @@ export class TextCase extends Component {
 	constructor(props) {
 		super(props)
 		this.state = {
-			isEditing: false, // Режим редактирования
-			title: props.case.title, // Поле для редактирования заголовка
-			text: props.case.text, // Поле для редактирования текста
+			isEditing: false, // Editing mode flag
+			title: props.case.title, // Editing the title
+			text: props.case.text, // Editing the text
 		}
 	}
 
-	// Обработка изменений заголовка
+	// Обновляем состояние, если props изменились
+	componentDidUpdate(prevProps) {
+		if (
+			prevProps.case.title !== this.props.case.title ||
+			prevProps.case.text !== this.props.case.text
+		) {
+			this.setState({
+				title: this.props.case.title,
+				text: this.props.case.text,
+			})
+		}
+	}
+
+	// Handle title change
 	handleTitleChange = e => {
 		this.setState({ title: e.target.value })
 	}
 
-	// Обработка изменений текста
+	// Handle text change
 	handleTextChange = e => {
 		this.setState({ text: e.target.value })
 	}
 
-	// Сохранение изменений
+	// Save the updated case
 	saveEdit = () => {
-		const updatedCase = {
-			...this.props.case,
+		const updatedFields = {
 			title: this.state.title,
 			text: this.state.text,
 		}
-		this.props.onSave(updatedCase) // Вызываем функцию сохранения из пропсов
-		this.setState({ isEditing: false }) // Выход из режима редактирования
+		this.props.onEdit(this.props.case.id, updatedFields) // Передаем ID и измененные поля
+		this.setState({ isEditing: false }) // Выходим из режима редактирования
 	}
 
-	// Включение режима редактирования
+	// Start editing the case
 	startEdit = () => {
 		this.setState({ isEditing: true })
 	}
 
-	// Отмена редактирования
+	// Cancel editing the case
 	cancelEdit = () => {
 		this.setState({
 			isEditing: false,
-			title: this.props.case.title, // Возвращаем исходные данные
-			text: this.props.case.text,
+			title: this.props.case.title, // Revert to original title
+			text: this.props.case.text, // Revert to original text
 		})
 	}
 

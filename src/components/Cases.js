@@ -1,47 +1,66 @@
 import React from 'react'
+import { observer } from 'mobx-react-lite'
 import Case from './Case'
 import TextCase from './TextCase'
 
-class Cases extends React.Component {
-	constructor(props) {
-		super(props)
-		this.state = {
-			elShow: {},
+const Cases = observer(
+	({
+		cases,
+		onSave,
+		onDeleteMain,
+		onDeleteNesting,
+		forTextMethod,
+		addNesting,
+		onEdit,
+	}) => {
+		const [selectedCase, setSelectedCase] = React.useState(null)
+
+		// Функция выбора задачи
+		const handleSelectCase = caseItem => {
+			setSelectedCase(caseItem)
+			forTextMethod(caseItem)
 		}
-		this.forTextMethod = this.forTextMethod.bind(this)
-	}
-	forTextMethod(e) {
-		this.setState({ elShow: e })
-		// console.log(target)
-	}
-	render() {
-		if (this.props.cases.length > 0) {
-			return (
-				<div className='container_case_textCase'>
-					<div className='container_users'>
-						{this.props.cases.map(el => (
-							<p>
-								<Case
-									onDeleteMain={this.props.onDeleteMain}
-									onDeleteNesting={this.props.onDeleteNesting}
-									cases={this.props.cases}
-									forText={this.forTextMethod}
-									key={el.id}
-									case={el}
-								/>
-							</p>
-						))}
-					</div>
-					<TextCase onSave={this.props.onSave} case={this.state.elShow} />
+
+		// Функция обработки редактирования
+		const handleEdit = (taskId, updatedFields) => {
+			onEdit(taskId, updatedFields) // Обновляем задачу через переданный метод onEdit
+
+			// Обновляем selectedCase, если редактируемая задача совпадает с выбранной
+			if (selectedCase?.id === taskId) {
+				setSelectedCase(prevCase => ({
+					...prevCase,
+					...updatedFields,
+				}))
+			}
+		}
+
+		return cases.length > 0 ? (
+			<div className='container_case_textCase'>
+				<div className='container_users'>
+					{console.log(cases)}
+					{cases.map(el => (
+						<Case
+							key={el.id}
+							case={el}
+							addNesting={addNesting}
+							onDeleteMain={onDeleteMain}
+							onDeleteNesting={onDeleteNesting}
+							selectCase={handleSelectCase}
+						/>
+					))}
 				</div>
-			)
-		} else
-			return (
-				<div className='user'>
-					<h3>Нет задач</h3>
-				</div>
-			)
+				{selectedCase ? (
+					<TextCase onEdit={handleEdit} case={selectedCase} />
+				) : (
+					<h3 className='h3_textCase'>Выберите задачу для отображения</h3>
+				)}
+			</div>
+		) : (
+			<div className='user'>
+				<h3>Нет задач</h3>
+			</div>
+		)
 	}
-}
+)
 
 export default Cases

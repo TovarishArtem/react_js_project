@@ -1,17 +1,17 @@
-import React from 'react'
-import Nesting from './Nesting'
+import React, { Component } from 'react'
 import { IoIosArrowBack } from 'react-icons/io'
+import { FaPlus } from 'react-icons/fa'
 
-class Case extends React.Component {
+export class Case extends Component {
 	constructor(props) {
 		super(props)
 		this.state = {
 			active_case: '1',
 			isDoneCases: {},
-			openMenu: false, // Стейт для контроля состояния выпадающего меню
-			isEditing: false, // Режим редактирования задачи
-			title: props.case.title, // Поле для редактирования заголовка
-			text: props.case.text, // Поле для редактирования текста
+			openMenu: false,
+			isEditing: false,
+			title: props.case.title,
+			text: props.case.text,
 		}
 	}
 
@@ -32,11 +32,10 @@ class Case extends React.Component {
 			title: this.state.title,
 			text: this.state.text,
 		}
-		// Предположим, что родительский компонент передает функцию saveEdit через пропсы
-		if (this.props.saveEdit) {
-			this.props.saveEdit(updatedCase)
+		if (this.props.onEdit) {
+			this.props.onEdit(updatedCase)
 		}
-		this.setState({ isEditing: false }) // Выход из режима редактирования
+		this.setState({ isEditing: false })
 	}
 
 	// Включение режима редактирования
@@ -48,11 +47,12 @@ class Case extends React.Component {
 	cancelEdit = () => {
 		this.setState({
 			isEditing: false,
-			title: this.props.case.title, // Возвращаем исходные данные
+			title: this.props.case.title,
 			text: this.props.case.text,
 		})
 	}
 
+	// Переключение видимости вложенных задач
 	toggleMenu = () => {
 		this.setState(prevState => ({
 			openMenu: !prevState.openMenu,
@@ -91,83 +91,98 @@ class Case extends React.Component {
 				[caseItem.id]: isMainDone,
 			}
 
-			if (isMainDone) {
-				caseItem.nesting?.forEach(subtask => {
-					newIsDoneCases[subtask.id] = true
-				})
-			} else {
-				caseItem.nesting?.forEach(subtask => {
-					newIsDoneCases[subtask.id] = false
-				})
-			}
+			caseItem.nesting?.forEach(subtask => {
+				newIsDoneCases[subtask.id] = isMainDone
+			})
 
 			return { isDoneCases: newIsDoneCases }
 		})
 	}
 
+	handleAddNesting = parentCase => {
+		const { addNesting } = this.props
+
+		// Новая подзадача
+		const newNestingCase = {
+			id: Date.now(), // Уникальный ID
+			title: 'Новая вложенная задача', // Заголовок подзадачи
+			text: 'Текст новой вложенной задачи', // Текст подзадачи
+			nesting: [], // Пустой массив подзадач
+		}
+
+		// Добавляем подзадачу к родительской задаче
+		if (addNesting) {
+			addNesting(newNestingCase, parentCase.id) // передаем родительскую задачу (parentCase)
+		} else {
+			console.error('addNesting is not defined or not passed as a prop')
+		}
+	}
+
+	// Рекурсивный рендер задач
+	renderCases = (caseItem, level = 0) => {
+		const isMainDone = this.state.isDoneCases[caseItem.id] || false
+
+		return (
+			<li key={caseItem.id}>
+				<div
+					className={`main_li_user ${isMainDone ? 'done' : ''}`}
+					style={{ marginLeft: level * 20 }} // Для визуального сдвига вложенности
+				>
+					<div className='user_container'>
+						<div
+							className={`user ${isMainDone ? 'done' : ''}`}
+							onClick={() => {
+								this.setState({ active_case: caseItem.id })
+								this.props.selectCase(caseItem)
+							}}
+						>
+							<div className='span_and_p'>
+								<IoIosArrowBack className='arrow' />
+								<p>{caseItem.title}</p>
+							</div>
+							<div className='add_nesting'>
+								<FaPlus onClick={() => this.handleAddNesting(caseItem)} />
+							</div>
+
+							<input
+								type='checkbox'
+								checked={isMainDone}
+								onChange={() => this.handleCheckboxChange(caseItem.id)}
+							/>
+							<span
+								onClick={() => this.props.onDeleteMain(caseItem)}
+								className='delete_icon'
+							>
+								x
+							</span>
+						</div>
+					</div>
+				</div>
+				{/* Рендер вложенных задач */}
+				{caseItem.nesting.length > 0 && (
+					<ul className={`nesting_ul ${this.state.openMenu ? 'open' : ''}`}>
+						{caseItem.nesting.map(nestedCase =>
+							this.renderCases(nestedCase, level + 1)
+						)}
+					</ul>
+				)}
+				{/* Кнопка добавления вложенной задачи */}
+			</li>
+		)
+	}
+
 	render() {
 		const { case: caseItem } = this.props
-		const isMainDone = this.state.isDoneCases[caseItem.id] || false
+
+		if (!caseItem) {
+			return null
+		}
 
 		return (
 			<div>
 				<ul className='menu'>
-					<li onClick={this.toggleMenu}>
-						<div className={`main_li_user ${isMainDone ? 'done' : ''}`}>
-							<div className='user_container'>
-								<div
-									className={`user ${isMainDone ? 'done' : ''}`}
-									onClick={() => {
-										this.setState({ active_case: caseItem.id })
-										this.props.forText(caseItem)
-									}}
-								>
-									<div className='span_and_p'>
-										<IoIosArrowBack className='arrow' />
-
-										<p>{caseItem.title}</p>
-									</div>
-
-									<input
-										type='checkbox'
-										checked={isMainDone}
-										onChange={this.handleMainCheckboxChange}
-									/>
-									<span
-										onClick={() => this.props.onDeleteMain(caseItem)}
-										className='delete_icon'
-									>
-										x
-									</span>
-								</div>
-							</div>
-						</div>
-
-						<ul className={`nesting_ul ${this.state.openMenu ? 'open' : ''}`}>
-							{this.props.cases.map(el => (
-								<div key={el.id}>
-									{el.nesting &&
-										el.nesting.map((elem, index) => {
-											if (elem.main_case === caseItem.title) {
-												return (
-													<p key={index}>
-														<Nesting
-															onDeleteNesting={this.props.onDeleteNesting}
-															forText={this.props.forText}
-															case={elem}
-															main_case={caseItem}
-															isDone={this.state.isDoneCases[elem.id] || false}
-															fun={() => this.handleCheckboxChange(elem.id)}
-														/>
-													</p>
-												)
-											}
-											return null
-										})}
-								</div>
-							))}
-						</ul>
-					</li>
+					{/* Начинаем рекурсивный рендер с основной задачи */}
+					{this.renderCases(caseItem)}
 				</ul>
 			</div>
 		)
