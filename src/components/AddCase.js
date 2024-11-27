@@ -4,10 +4,10 @@ class AddCase extends React.Component {
 	constructor(props) {
 		super(props)
 		this.state = {
-			main_case: '', // ID of the selected parent task
+			main_case: '',
 			title: '',
 			text: '',
-			activeCase: '', // To visualize the selected task
+			activeCase: '',
 		}
 	}
 
@@ -37,23 +37,20 @@ class AddCase extends React.Component {
 		e.preventDefault()
 		const { main_case, title, text } = this.state
 
-		// Do nothing if title or text are empty
 		if (!title || !text) return
 
-		// Create a new case object
 		const newCase = {
 			title,
 			text,
-			id: Date.now(), // Use a timestamp for the unique task ID
-			nesting: [], // Empty nesting for now, to be added if it's a nested task
+			id: Date.now(),
+			nesting: [],
 		}
-		this.props.onAdd(newCase) // Add as a new main task
+		this.props.onAdd(newCase)
 
-		// Reset the form state after submission
 		this.setState({
 			title: '',
 			text: '',
-			activeCase: '', // Reset the active case ID
+			activeCase: '',
 		})
 	}
 
@@ -63,7 +60,6 @@ class AddCase extends React.Component {
 				<form ref={el => (this.myForm = el)} onSubmit={this.handleSubmit}>
 					<div className='container_cases_on_top'>
 						{/* {this.props.cases && this.renderCases(this.props.cases)}{' '} */}
-						{/* Render tasks */}
 					</div>
 
 					<input

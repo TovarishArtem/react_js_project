@@ -5,9 +5,29 @@
 	padding: 0;
 }
 body {
-	background-color: gray;
+	background: rgb(174, 175, 170);
+	background: radial-gradient(
+		circle,
+		rgba(174, 175, 170, 1) 33%,
+		rgba(0, 0, 0, 1) 48%,
+		rgba(141, 151, 153, 1) 100%
+	);
 	font-family: 'Rubik', sans-serif;
 	font-weight: 400;
+	animation: body_animation 30s ease infinite;
+	background-size: 200% 200%; /* Добавлено */
+}
+
+@keyframes body_animation {
+	0% {
+		background-position: 0% 50%;
+	}
+	50% {
+		background-position: 100% 50%;
+	}
+	100% {
+		background-position: 0% 50%;
+	}
 }
 .header {
 	padding: 20px 100px;
@@ -241,7 +261,7 @@ form button:hover {
 }
 .textCase {
 	background-color: #dce0e1;
-
+	border-radius: 10px;
 	font-size: 18px;
 	line-height: 23.4px;
 	padding: 2em;
@@ -250,6 +270,9 @@ form button:hover {
 	white-space: normal;
 	overflow: scroll;
 	position: relative;
+	overflow: auto;
+	border: 2px solid black;
+	margin-top: -4px;
 }
 .textCase p {
 	padding-top: 1em;
