@@ -1,4 +1,3 @@
 # Getting Started with Create React App
 ## Создание формы, отображения списка задач, вебхуки, состояние
-![image](https://github.com/user-attachments/assets/8f4c6330-655f-4b77-a903-ebc4918ecfc9)
-
+![react_list](https://github.com/user-attachments/assets/5dcf12b0-d9e6-49de-ac33-9b38a2f695e3)
